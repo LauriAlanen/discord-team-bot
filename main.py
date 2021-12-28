@@ -5,7 +5,7 @@ import random
 bot = commands.Bot(command_prefix="/", help_command=None)
 
 emoji = '\N{THUMBS UP SIGN}'
-shuffle_list = []
+shuffle_dict = {}
 
 bot.channel_id = int()
 bot.msg_id = int()
@@ -21,6 +21,7 @@ async def help(ctx):
     embed.add_field(name="/autochannel_off", value="Don't create a channel when shuffling")
     embed.add_field(name="/shuffle", value="Randomize and divide the teams")
     embed.add_field(name="/aim", value="See how good your aim is")
+    embed.add_field(name="/source", value="See the source code")
     await ctx.send(embed=embed)
 
 
@@ -41,35 +42,52 @@ async def teams(ctx):
 
         elif "Team-1" in voice_channels and "Team-2" not in voice_channels:
             await bot.guild.create_voice_channel("Team-2")
-            
+
         else:
             await bot.guild.create_voice_channel("Team-1")
             await bot.guild.create_voice_channel("Team-2")
 
     poll = await ctx.send("React with thumbs up to this message to join the poll.", delete_after=60)
     await poll.add_reaction(emoji)
+
     bot.msg_id = poll.id
     bot.channel_id = poll.channel
+
+    bot.team1_id = discord.utils.get(bot.guild.channels, name="Team-1").id
+    bot.team2_id = discord.utils.get(bot.guild.channels, name="Team-2").id
+    bot.team1 = bot.get_channel(bot.team1_id)
+    bot.team2 = bot.get_channel(bot.team2_id)
+
     voice_channels.clear()
 
 
 @bot.command()
 async def shuffle(ctx):
-    if shuffle_list:
-        middle_index = len(shuffle_list) // 2
-        random_list = random.sample(shuffle_list, len(shuffle_list))
+    if shuffle_dict:
         embed = discord.Embed(
             title="Divided Teams",
             colour=discord.Colour.blue()
         )
 
-        embed.add_field(name="Team 1", value=f"{random_list[:middle_index]}")
-        embed.add_field(name="Team 2", value=f"{random_list[middle_index:]}")
+        items = list(shuffle_dict.items())
+        random.shuffle(items)
+
+        players1 = dict(list(shuffle_dict.items())[len(shuffle_dict) // 2:])
+        players2 = dict(list(shuffle_dict.items())[:len(shuffle_dict) // 2])
+
+        embed.add_field(name="Team 1", value=f"{players1}")
+        embed.add_field(name="Team 2", value=f"{players2}")
         await ctx.send(embed=embed)
+
+        for member in players1:
+            print(member)
+        for member in players2:
+            print(member)
+
 
         msg = await bot.channel_id.fetch_message(bot.msg_id)
         await msg.delete()
-        shuffle_list.clear()
+        shuffle_dict.clear()
 
     else:
         await ctx.send("The poll seems to be empty...")
@@ -96,12 +114,20 @@ async def aim(ctx):
     else:
         await ctx.send(f"{ctx.author.name}'s headshot accuracy is {random.randrange(0, 30)}%")
 
+@bot.command()
+async def source(ctx):
+    await ctx.send("https://github.com/LauriAlanen/discord-team-bot/blob/main/main.py")
+
+
+
 
 @bot.event
 async def on_reaction_add(reaction, user):
     if user != bot.user:
         if str(reaction.emoji) == emoji:
-            shuffle_list.append(user.name)
+            shuffle_dict[user.name] = user.id
 
 
-bot.run("token")
+
+
+bot.run("OTI1MDQzNjAxMDk0OTAxODAw.YcnX_A.g7aIa3kGqvAL9jLFv2pYwmagZBY")
