@@ -130,4 +130,4 @@ async def on_reaction_add(reaction, user):
 
 
 
-bot.run("token")
+bot.run("OTI1MDQzNjAxMDk0OTAxODAw.YcnX_A.g7aIa3kGqvAL9jLFv2pYwmagZBY")
