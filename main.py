@@ -104,4 +104,4 @@ async def on_reaction_add(reaction, user):
             shuffle_list.append(user.name)
 
 
-bot.run("OTI1MDQzNjAxMDk0OTAxODAw.YcnX_A.N-Si-8nc5jb-_SFiUCq83ZRA0yU")
+bot.run("token")
