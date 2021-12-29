@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+import discord.utils
 import random
 
 bot = commands.Bot(command_prefix="/", help_command=None)
@@ -10,7 +11,6 @@ shuffle_dict = {}
 bot.channel_id = int()
 bot.msg_id = int()
 bot.autochannel_state = 1  # Muista vaihtaa 0
-
 
 
 @bot.command()
@@ -53,10 +53,10 @@ async def teams(ctx):
     bot.msg_id = poll.id
     bot.channel_id = poll.channel
 
-    bot.team1_id = discord.utils.get(bot.guild.channels, name="Team-1").id
-    bot.team2_id = discord.utils.get(bot.guild.channels, name="Team-2").id
-    bot.team1 = bot.get_channel(bot.team1_id)
-    bot.team2 = bot.get_channel(bot.team2_id)
+    bot.channel1_id = discord.utils.get(bot.guild.channels, name="Team-1").id
+    bot.channel2_id = discord.utils.get(bot.guild.channels, name="Team-2").id
+    bot.channel1 = bot.get_channel(bot.channel1_id)
+    bot.channel2 = bot.get_channel(bot.channel2_id)
 
     voice_channels.clear()
 
@@ -64,26 +64,25 @@ async def teams(ctx):
 @bot.command()
 async def shuffle(ctx):
     if shuffle_dict:
+
+        items = list(shuffle_dict.items())
+        random.shuffle(items)
+        players1 = dict(list(shuffle_dict.items())[len(shuffle_dict) // 2:])
+        players2 = dict(list(shuffle_dict.items())[:len(shuffle_dict) // 2])
+
         embed = discord.Embed(
             title="Divided Teams",
             colour=discord.Colour.blue()
         )
-
-        items = list(shuffle_dict.items())
-        random.shuffle(items)
-
-        players1 = dict(list(shuffle_dict.items())[len(shuffle_dict) // 2:])
-        players2 = dict(list(shuffle_dict.items())[:len(shuffle_dict) // 2])
-
-        embed.add_field(name="Team 1", value=f"{players1}")
-        embed.add_field(name="Team 2", value=f"{players2}")
+        embed.add_field(name="Team 1", value=f"{list(players1)}")
+        embed.add_field(name="Team 2", value=f"{list(players2)}")
         await ctx.send(embed=embed)
 
-        for member in players1:
-            print(member)
-        for member in players2:
-            print(member)
-
+        if bot.autochannel_state == 1:
+            for user in players1:
+                await players1[user].move_to(bot.channel1)
+            for user in players2:
+                await players2[user].move_to(bot.channel2)
 
         msg = await bot.channel_id.fetch_message(bot.msg_id)
         await msg.delete()
@@ -114,18 +113,17 @@ async def aim(ctx):
     else:
         await ctx.send(f"{ctx.author.name}'s headshot accuracy is {random.randrange(0, 30)}%")
 
+
 @bot.command()
 async def source(ctx):
     await ctx.send("https://github.com/LauriAlanen/discord-team-bot/blob/main/main.py")
-
-
 
 
 @bot.event
 async def on_reaction_add(reaction, user):
     if user != bot.user:
         if str(reaction.emoji) == emoji:
-            shuffle_dict[user.name] = user.id
+            shuffle_dict[user.name] = user
 
 
 
