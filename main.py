@@ -14,8 +14,6 @@ bot.autochannel_state = 1  # Muista vaihtaa 0
 
 bot.counter = 0
 
-bot.images = ["pics/SHroCK.jpg", "pics/xPxsTIk.png"]
-
 
 @bot.command()
 async def help(ctx):
@@ -27,7 +25,6 @@ async def help(ctx):
     embed.add_field(name="/aim", value="See how good your aim is")
     embed.add_field(name="/source", value="See the source code")
     embed.add_field(name="/count", value="Start the counter")
-    embed.add_field(name="/gm", value="Good morning")
     await ctx.send(embed=embed)
 
 
@@ -122,27 +119,13 @@ async def count(ctx):
 async def aim(ctx):
     if "Martti" in ctx.author.name or "martti" in ctx.author.name:
         await ctx.send(f"{ctx.author.name}'s headshot accuracy is 100%")
-    elif "Jouko" in ctx.author.name:
-        await ctx.send("Hähäääää äijä ei osu vittu mihinkää :DDDDDD")
     else:
         await ctx.send(f"{ctx.author.name}'s headshot accuracy is {random.randrange(0, 30)}%")
 
-@bot.command()
-async def pallikarva(ctx):
-    await ctx.send("https://www.youtube.com/watch?v=T9MS_cGXO08&ab_channel=jjimi1")
-    await ctx.send("https://www.youtube.com/watch?v=aCH3GV4E_kk&ab_channel=jjimi1")
-    await ctx.send("https://www.youtube.com/watch?v=nZaZtdNU4ws&ab_channel=jjimi1")
-    await ctx.send("https://www.youtube.com/watch?v=tCnBrhM5HGk&ab_channel=jjimi1")
 
 @bot.command()
 async def source(ctx):
     await ctx.send("https://github.com/LauriAlanen/discord-team-bot/blob/main/main.py")
-
-@bot.command()
-async def gm(ctx):
-    with open(random.choice(bot.images), "rb") as f:
-        pic = discord.File(f)
-        await ctx.send(file=pic)
 
 @bot.event
 async def on_reaction_add(reaction, user):
