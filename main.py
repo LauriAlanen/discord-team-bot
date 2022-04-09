@@ -10,7 +10,7 @@ shuffle_dict = {}
 
 bot.channel_id = int()
 bot.msg_id = int()
-bot.autochannel_state = 1  # Muista vaihtaa 0
+bot.autochannel_state = 1 
 
 bot.counter = 0
 
